@@ -11,16 +11,20 @@ def get_folder_size(root):
     for path, dirs, files in os.walk(root):
         for f in files:
             fp = os.path.join(path, f)
-            size += os.path.getsize(fp)
-    return round(size / 1000000, 2)
+            size += os.path.getsize(fp) / 1048576
+    return round(size, 2)
 
 
-path = "E:/test/"
-original_folder_size = get_folder_size(path)
+path = ""
+
+
+
 
 path = input("Specify the root dir\nLike C:/dir/pics/\nRoot dir: ")
 custom_quality = int(input("Quality: "))
 min_file_size = input("Min file size to convert(in MB): ")
+
+original_folder_size = get_folder_size(path)
 
 files_fullpath = []
 counter = 0
@@ -30,7 +34,6 @@ for subdir, dirs, files in os.walk(path):
             files_fullpath.append(subdir + '/' + file)
 
 print("Files found: " + str(len(files_fullpath)))
-
 
 def resize():
     percent = 0
