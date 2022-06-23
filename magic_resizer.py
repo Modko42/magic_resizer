@@ -20,6 +20,7 @@ path = ""
 path = input("Specify the root dir\nLike C:/dir/pics/\nRoot dir: ")
 custom_quality = int(input("Quality: "))
 min_file_size = input("Min file size to convert(in MB): ")
+max_file_size = input("Max file size to convert(in MB): ")
 
 original_folder_size = get_folder_size(path)
 
@@ -27,7 +28,8 @@ files_fullpath = []
 counter = 0
 for subdir, dirs, files in os.walk(path):
     for file in files:
-        if get_file_size_inMB(subdir + '/' + file) > min_file_size:
+        file_size = get_file_size_inMB(subdir + '/' + file)
+        if min_file_size < file_size < max_file_size:
             files_fullpath.append(subdir + '/' + file)
 
 print("Files found: " + str(len(files_fullpath)))
