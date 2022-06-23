@@ -3,7 +3,7 @@ import os
 
 
 def get_file_size_inMB(file):
-    return str(os.stat(file).st_size / 1000000)
+    return os.stat(file).st_size / 1048576
 
 
 def get_folder_size(root):
@@ -19,8 +19,8 @@ path = ""
 
 path = input("Specify the root dir\nLike C:/dir/pics/\nRoot dir: ")
 custom_quality = int(input("Quality: "))
-min_file_size = input("Min file size to convert(in MB): ")
-max_file_size = input("Max file size to convert(in MB): ")
+min_file_size = float(input("Min file size to convert(in MB): "))
+max_file_size = float(input("Max file size to convert(in MB): "))
 
 original_folder_size = get_folder_size(path)
 
