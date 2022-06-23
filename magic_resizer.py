@@ -17,9 +17,6 @@ def get_folder_size(root):
 
 path = ""
 
-
-
-
 path = input("Specify the root dir\nLike C:/dir/pics/\nRoot dir: ")
 custom_quality = int(input("Quality: "))
 min_file_size = input("Min file size to convert(in MB): ")
@@ -35,6 +32,7 @@ for subdir, dirs, files in os.walk(path):
 
 print("Files found: " + str(len(files_fullpath)))
 
+
 def resize():
     percent = 0
     i = 0
@@ -43,16 +41,22 @@ def resize():
             percent = round(100 * i / len(files_fullpath), 2)
             print(str(percent) + " % done")
         if os.path.isfile(file) and file.split('.')[-1].lower() == 'jpg':
-            im = Image.open(file)
-            f, e = os.path.splitext(file)
-            im.save(f + '.jpg', 'JPEG', quality=custom_quality)
+            try:
+                im = Image.open(file)
+                f, e = os.path.splitext(file)
+                im.save(f + '.jpg', 'JPEG', quality=custom_quality)
+            except:
+                print("Problem with image: " + str(file))
             i = i + 1
         if os.path.isfile(file) and file.split('.')[-1].lower() == 'bmp':
-            im = Image.open(file)
-            f, e = os.path.splitext(file)
-            im.save(f + '.jpg', 'JPEG', quality=custom_quality)
-            im.close()
-            os.remove(file)
+            try:
+                im = Image.open(file)
+                f, e = os.path.splitext(file)
+                im.save(f + '.jpg', 'JPEG', quality=custom_quality)
+                im.close()
+                os.remove(file)
+            except:
+                print("Problem with image: " + str(file))
             i = i + 1
 
 
