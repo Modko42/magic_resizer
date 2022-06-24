@@ -2,6 +2,7 @@ from PIL import Image
 import os
 
 
+
 def get_file_size_inMB(file):
     return os.stat(file).st_size / 1048576
 
@@ -10,8 +11,7 @@ def get_folder_size(root):
     size = 0
     for path, dirs, files in os.walk(root):
         for f in files:
-            fp = os.path.join(path, f)
-            size += os.path.getsize(fp) / 1048576
+            size += os.path.getsize(os.path.join(path, f)) / 1048576
     return round(size, 2)
 
 
@@ -24,15 +24,19 @@ max_file_size = float(input("Max file size to convert(in MB): "))
 
 original_folder_size = get_folder_size(path)
 
-files_fullpath = []
-counter = 0
-for subdir, dirs, files in os.walk(path):
-    for file in files:
-        file_size = get_file_size_inMB(subdir + '/' + file)
-        if min_file_size < file_size < max_file_size:
-            files_fullpath.append(subdir + '/' + file)
+def list_all_files():
+    filepaths = []
+    for subdir, dirs, files in os.walk(path):
+        for file in files:
+            file_size = get_file_size_inMB(subdir + '/' + file)
+            if min_file_size < file_size < max_file_size:
+                filepaths.append(subdir + '/' + file)
 
-print("Files found: " + str(len(files_fullpath)))
+    print("Files found: " + str(len(filepaths)))
+    return filepaths
+
+
+files_fullpath = list_all_files()
 
 
 def resize():
