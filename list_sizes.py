@@ -24,4 +24,5 @@ list_all_files(path)
 
 df = pd.DataFrame(files_with_extandsize,columns=['extension','size'])
 
+
 print(df.groupby('extension').agg(['sum','count']))
