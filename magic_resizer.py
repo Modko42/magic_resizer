@@ -19,6 +19,7 @@ path = ""
 
 path = input("Specify the root dir\nLike C:/dir/pics/\nRoot dir: ")
 custom_quality = int(input("Quality: "))
+custom_quality_png = int(input("Quality(PNG): "))
 min_file_size = float(input("Min file size to convert(in MB): "))
 max_file_size = float(input("Max file size to convert(in MB): "))
 
@@ -59,6 +60,16 @@ def resize():
                 im = Image.open(file)
                 f, e = os.path.splitext(file)
                 im.save(f + '.jpg', 'JPEG', quality=custom_quality)
+                im.close()
+                os.remove(file)
+            except:
+                print("Problem with image: " + str(file))
+            i = i + 1
+        if os.path.isfile(file) and file.split('.')[-1].lower() == 'png':
+            try:
+                im = Image.open(file).convert('RGB')
+                f, e = os.path.splitext(file)
+                im.save(f + '.jpg', 'JPEG', quality=custom_quality_png)
                 im.close()
                 os.remove(file)
             except:
