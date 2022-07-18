@@ -1,13 +1,16 @@
+import concurrent.futures
 import tkinter
 from tkinter import filedialog
+from threading import *
 
-from PIL import Image
+import PIL.Image
 import os
 import tkinter as tk
+import numpy as np
 
 from tkinter import *
 
-
+global original_folder_size
 global path
 path = ""
 
@@ -30,6 +33,7 @@ def callback():
     print("Current min file size: " + str(min_file_size_var.get()))
     print("Current max file size: " + str(max_file_size_var.get()))
 
+
 window = tk.Tk()
 
 folder_label_var = StringVar()
@@ -39,12 +43,13 @@ quality_var = StringVar()
 quality_png_var = StringVar()
 min_file_size_var = StringVar()
 max_file_size_var = StringVar()
+finished_percent_var = StringVar()
 
 quality_var.set(85)
 quality_png_var.set(95)
 min_file_size_var.set(2)
 max_file_size_var.set(50)
-
+finished_percent_var.set("Finished: 0 %")
 
 def draw_gui():
     window.title("TheBestResizerEver")
@@ -78,8 +83,12 @@ def draw_gui():
     max_file_size_field = tkinter.Entry(window, width=3, textvariable=max_file_size_var)
     max_file_size_field.place(x=110, y=150)
 
-    start_button = tkinter.Button(window,text="Start",command=resize)
-    start_button.place(x=20,y=180)
+    start_button = tkinter.Button(window, text="Start", command=start_new_thread)
+    start_button.place(x=20, y=180)
+
+    finished_label_percent = tkinter.Label(window, width=20, textvariable=finished_percent_var)
+    finished_label_percent.place(x=150, y=60)
+
 
     window.mainloop()
 
@@ -92,13 +101,8 @@ def select_file():
     folder_label_var.set(".." + path[-30:])
 
 
-
-
-original_folder_size = get_folder_size(path)
-
-
 def list_all_files():
-    print(path)
+    global original_folder_size
     filepaths = []
     for subdir, dirs, files in os.walk(path):
         for file in files:
@@ -107,53 +111,77 @@ def list_all_files():
                 filepaths.append(subdir + '/' + file)
 
     print("Files found: " + str(len(filepaths)))
+    original_folder_size = get_folder_size(path)
     return filepaths
 
-files_fullpath = []
+
+original_folder_size = 0
+global file_count
+global finished_counter
+global percent
+file_count = 0
+finished_counter = 0
+percent = 0
+
+def start_new_thread():
+    global file_count
+    files_fullpath = np.array(list_all_files())
+    file_count = len(files_fullpath)
+    chuncks = np.array_split(files_fullpath,8)
+    t1 = Thread(target=resize,args=[chuncks[0]])
+    t1.start()
+    t2 = Thread(target=resize,args=[chuncks[1]])
+    t2.start()
+    t3 = Thread(target=resize,args=[chuncks[2]])
+    t3.start()
+    t4 = Thread(target=resize,args=[chuncks[3]])
+    t4.start()
+    t5 = Thread(target=resize, args=[chuncks[4]])
+    t5.start()
+    t6 = Thread(target=resize, args=[chuncks[5]])
+    t6.start()
+    t7 = Thread(target=resize, args=[chuncks[6]])
+    t7.start()
+    t8 = Thread(target=resize, args=[chuncks[7]])
+    t8.start()
 
 
-def resize():
-    files_fullpath = list_all_files()
-    print(files_fullpath)
-    percent = 0
-    i = 0
-    for file in files_fullpath:
-        if percent + 1 < round(100 * i / len(files_fullpath), 2):
-            percent = round(100 * i / len(files_fullpath), 2)
-            print(str(percent) + " % done")
+def resize(file_paths):
+    global percent
+    global finished_counter
+    for file in file_paths:
+        if percent + 1 < round(100 * finished_counter / file_count, 2):
+            percent = round(100 * finished_counter / file_count, 2)
+            finished_percent_var.set("Finished: "+str(percent)+"%")
         if os.path.isfile(file) and file.split('.')[-1].lower() == 'jpg':
             try:
-                im = Image.open(file)
+                im = PIL.Image.open(file)
                 f, e = os.path.splitext(file)
                 im.save(f + '.jpg', 'JPEG', quality=int(quality_var.get()))
             except Exception as e:
                 print(e)
                 print("Problem with image: " + str(file))
-            i = i + 1
+            finished_counter = finished_counter + 1
         if os.path.isfile(file) and file.split('.')[-1].lower() == 'bmp':
             try:
-                im = Image.open(file)
+                im = PIL.Image.open(file)
                 f, e = os.path.splitext(file)
                 im.save(f + '.jpg', 'JPEG', quality=int(quality_var.get()))
                 im.close()
                 os.remove(file)
             except:
                 print("Problem with image: " + str(file))
-            i = i + 1
+            finished_counter = finished_counter + 1
         if os.path.isfile(file) and file.split('.')[-1].lower() == 'png':
             try:
-                im = Image.open(file).convert('RGB')
+                im = PIL.Image.open(file).convert('RGB')
                 f, e = os.path.splitext(file)
                 im.save(f + '.jpg', 'JPEG', quality=int(quality_png_var.get()))
                 im.close()
                 os.remove(file)
             except:
                 print("Problem with image: " + str(file))
-            i = i + 1
+            finished_counter = finished_counter + 1
 
 
 draw_gui()
-
-resized_folder_size = get_folder_size(path)
-print("Original total size: " + str(original_folder_size) + " MB")
-print("Resized  total size: " + str(resized_folder_size) + " MB")
