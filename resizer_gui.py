@@ -7,7 +7,6 @@ import tkinter as tk
 
 from tkinter import *
 
-from magic_resizer import custom_quality
 
 global path
 path = ""
@@ -79,8 +78,8 @@ def draw_gui():
     max_file_size_field = tkinter.Entry(window, width=3, textvariable=max_file_size_var)
     max_file_size_field.place(x=110, y=150)
 
-    #start_button = tkinter.Button(window,text="Start",command=resize)
-    #start_button.place(x=20,y=180)
+    start_button = tkinter.Button(window,text="Start",command=resize)
+    start_button.place(x=20,y=180)
 
     window.mainloop()
 
@@ -99,7 +98,7 @@ original_folder_size = get_folder_size(path)
 
 
 def list_all_files():
-    global path
+    print(path)
     filepaths = []
     for subdir, dirs, files in os.walk(path):
         for file in files:
@@ -110,11 +109,12 @@ def list_all_files():
     print("Files found: " + str(len(filepaths)))
     return filepaths
 
-
-files_fullpath = list_all_files()
+files_fullpath = []
 
 
 def resize():
+    files_fullpath = list_all_files()
+    print(files_fullpath)
     percent = 0
     i = 0
     for file in files_fullpath:
@@ -126,14 +126,15 @@ def resize():
                 im = Image.open(file)
                 f, e = os.path.splitext(file)
                 im.save(f + '.jpg', 'JPEG', quality=int(quality_var.get()))
-            except:
+            except Exception as e:
+                print(e)
                 print("Problem with image: " + str(file))
             i = i + 1
         if os.path.isfile(file) and file.split('.')[-1].lower() == 'bmp':
             try:
                 im = Image.open(file)
                 f, e = os.path.splitext(file)
-                im.save(f + '.jpg', 'JPEG', quality=custom_quality)
+                im.save(f + '.jpg', 'JPEG', quality=int(quality_var.get()))
                 im.close()
                 os.remove(file)
             except:
