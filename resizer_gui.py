@@ -138,6 +138,8 @@ def select_file():
     path = filedialog.askdirectory(
         title='Open a file',
         initialdir='/')
+    if not os.path.isdir(path.name):
+        folder_label_var.set("No root folder selected")
     folder_label_var.set(path[-60:-30] + '\n' + path[-30:])
 
 
@@ -165,13 +167,18 @@ def list_all_files():
 
 
 def make_preview():
-    preview_path = filedialog.askopenfile(
-        title='Choose a file to preview settings',
-        initialdir='/').name
-    shutil.copy(preview_path, os.path.join(os.getcwd(), 'preview_original.jpg'))
-    shutil.copy(preview_path, os.path.join(os.getcwd(), 'preview_resized.jpg'))
-    resize([os.path.join(os.getcwd(), 'preview_resized.jpg')], Preview_mode=True)
-    showinfo("Succes", "Preview generated!")
+    try:
+        preview_path = filedialog.askopenfile(
+            title='Choose a file to preview settings',
+            initialdir='/').name
+        shutil.copy(preview_path, os.path.join(os.getcwd(), 'preview_original.jpg'))
+        shutil.copy(preview_path, os.path.join(os.getcwd(), 'preview_resized.jpg'))
+        resize([os.path.join(os.getcwd(), 'preview_resized.jpg')], Preview_mode=True)
+        showinfo("Succes", "Preview generated!")
+    except Exception as e:
+        print(e)
+        print("You probably didn't choose a file!")
+
 
 
 def start_new_threads():
