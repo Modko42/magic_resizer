@@ -1,7 +1,9 @@
 import concurrent.futures
 import tkinter
-from tkinter import filedialog
+from tkinter import filedialog, tix
 from threading import *
+from tkinter.messagebox import showinfo
+from tkinter.tix import *
 
 import PIL.Image
 import os
@@ -34,7 +36,7 @@ def callback():
     print("Current max file size: " + str(max_file_size_var.get()))
 
 
-window = tk.Tk()
+window = Tk()
 
 folder_label_var = StringVar()
 folder_label_var.set("Default")
@@ -54,11 +56,13 @@ finished_percent_var.set("Finished: 0 %")
 def draw_gui():
     window.title("TheBestResizerEver")
     window.geometry("450x300")
+    window.eval('tk::PlaceWindow . center')
     window.resizable(False, False)
     open_button = tkinter.Button(window, text='Choose root folder', command=select_file)
     open_button.place(x=20, y=20)
     folder_label = tkinter.Label(window, textvariable=folder_label_var)
     folder_label.place(x=200, y=22)
+
     quality_label = tkinter.Label(window, text="Quality: ")
     quality_label.place(x=20, y=62)
     quality_var.trace("w", lambda name, index, mode, quality_var=quality_var: callback())
@@ -83,14 +87,17 @@ def draw_gui():
     max_file_size_field = tkinter.Entry(window, width=3, textvariable=max_file_size_var)
     max_file_size_field.place(x=110, y=150)
 
-    start_button = tkinter.Button(window, text="Start", command=start_new_thread)
+    start_button = tkinter.Button(window, text="Start", command=start_new_threads)
     start_button.place(x=20, y=180)
 
     finished_label_percent = tkinter.Label(window, width=20, textvariable=finished_percent_var)
     finished_label_percent.place(x=150, y=60)
 
 
+
+
     window.mainloop()
+
 
 
 def select_file():
@@ -98,7 +105,7 @@ def select_file():
     path = filedialog.askdirectory(
         title='Open a file',
         initialdir='/')
-    folder_label_var.set(".." + path[-30:])
+    folder_label_var.set(path[-60:-30] +'\n'+ path[-30:])
 
 
 def list_all_files():
@@ -123,36 +130,36 @@ file_count = 0
 finished_counter = 0
 percent = 0
 
-def start_new_thread():
+def start_new_threads():
     global file_count
     files_fullpath = np.array(list_all_files())
     file_count = len(files_fullpath)
-    chuncks = np.array_split(files_fullpath,8)
-    t1 = Thread(target=resize,args=[chuncks[0]])
+    chunks = np.array_split(files_fullpath,8)
+    t1 = Thread(target=resize, args=[chunks[0]])
     t1.start()
-    t2 = Thread(target=resize,args=[chuncks[1]])
+    t2 = Thread(target=resize, args=[chunks[1]])
     t2.start()
-    t3 = Thread(target=resize,args=[chuncks[2]])
+    t3 = Thread(target=resize, args=[chunks[2]])
     t3.start()
-    t4 = Thread(target=resize,args=[chuncks[3]])
+    t4 = Thread(target=resize, args=[chunks[3]])
     t4.start()
-    t5 = Thread(target=resize, args=[chuncks[4]])
+    t5 = Thread(target=resize, args=[chunks[4]])
     t5.start()
-    t6 = Thread(target=resize, args=[chuncks[5]])
+    t6 = Thread(target=resize, args=[chunks[5]])
     t6.start()
-    t7 = Thread(target=resize, args=[chuncks[6]])
+    t7 = Thread(target=resize, args=[chunks[6]])
     t7.start()
-    t8 = Thread(target=resize, args=[chuncks[7]])
+    t8 = Thread(target=resize, args=[chunks[7]])
     t8.start()
 
 
+
+
+
 def resize(file_paths):
-    global percent
     global finished_counter
+    global percent
     for file in file_paths:
-        if percent + 1 < round(100 * finished_counter / file_count, 2):
-            percent = round(100 * finished_counter / file_count, 2)
-            finished_percent_var.set("Finished: "+str(percent)+"%")
         if os.path.isfile(file) and file.split('.')[-1].lower() == 'jpg':
             try:
                 im = PIL.Image.open(file)
@@ -182,6 +189,10 @@ def resize(file_paths):
             except:
                 print("Problem with image: " + str(file))
             finished_counter = finished_counter + 1
-
-
+        if percent + 1 < round(100 * finished_counter / file_count, 2):
+            percent = round(100 * finished_counter / file_count, 2)
+            finished_percent_var.set("Finished: "+str(percent)+"%")
+        if finished_counter == file_count:
+            finished_percent_var.set("Finished: " + str(100) + "%")
+            showinfo("Success", "Image compression finished")
 draw_gui()
