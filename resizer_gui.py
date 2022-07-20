@@ -1,13 +1,10 @@
-import concurrent.futures
 import tkinter
-from tkinter import filedialog, tix
+from tkinter import filedialog
 from threading import *
 from tkinter.messagebox import showinfo
-from tkinter.tix import *
 
 import PIL.Image
 import os
-import tkinter as tk
 import numpy as np
 
 from tkinter import *
@@ -126,9 +123,11 @@ original_folder_size = 0
 global file_count
 global finished_counter
 global percent
+global thread_finished_counter
 file_count = 0
 finished_counter = 0
 percent = 0
+thread_finished_counter = 0
 
 def start_new_threads():
     global file_count
@@ -159,6 +158,7 @@ def start_new_threads():
 def resize(file_paths):
     global finished_counter
     global percent
+    global thread_finished_counter
     for file in file_paths:
         if os.path.isfile(file) and file.split('.')[-1].lower() == 'jpg':
             try:
@@ -192,7 +192,8 @@ def resize(file_paths):
         if percent + 1 < round(100 * finished_counter / file_count, 2):
             percent = round(100 * finished_counter / file_count, 2)
             finished_percent_var.set("Finished: "+str(percent)+"%")
-        if finished_counter == file_count:
-            finished_percent_var.set("Finished: " + str(100) + "%")
-            showinfo("Success", "Image compression finished")
+    thread_finished_counter += 1
+    if thread_finished_counter == 8:
+        finished_percent_var.set("Finished: " + str(100) + "%")
+        showinfo("Success", "Image compression finished")
 draw_gui()
