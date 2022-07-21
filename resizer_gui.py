@@ -66,7 +66,7 @@ quality_png_var.set(95)
 min_file_size_var.set(2)
 max_file_size_var.set(50)
 finished_percent_var.set("Finished: 0 %")
-cpu_core_count_var.set(4)
+cpu_core_count_var.set(10)
 keep_originals.set(1)
 
 
@@ -84,31 +84,31 @@ def draw_gui():
     quality_label.place(x=20, y=60)
     quality_var.trace("w", lambda name, index, mode, quality_var=quality_var: callback())
     quality_field = tkinter.Entry(window, width=3, textvariable=quality_var)
-    quality_field.place(x=120, y=60)
+    quality_field.place(x=130, y=60)
 
     quality_png_label = tkinter.Label(window, text="Quality(png): ")
     quality_png_label.place(x=20, y=90)
     quality_png_var.trace("w", lambda name, index, mode, quality_png_var=quality_png_var: callback())
     quality_png_field = tkinter.Entry(window, width=3, textvariable=quality_png_var)
-    quality_png_field.place(x=120, y=90)
+    quality_png_field.place(x=130, y=90)
 
     min_file_size_label = tkinter.Label(window, text="Min size(MB): ")
     min_file_size_label.place(x=20, y=120)
     min_file_size_var.trace("w", lambda name, index, mode, min_file_size_var=min_file_size_var: callback())
     min_file_size_field = tkinter.Entry(window, width=3, textvariable=min_file_size_var)
-    min_file_size_field.place(x=120, y=120)
+    min_file_size_field.place(x=130, y=120)
 
     max_file_size_label = tkinter.Label(window, text="Max size(MB): ")
     max_file_size_label.place(x=20, y=150)
     max_file_size_var.trace("w", lambda name, index, mode, max_file_size_var=max_file_size_var: callback())
     max_file_size_field = tkinter.Entry(window, width=3, textvariable=max_file_size_var)
-    max_file_size_field.place(x=120, y=150)
+    max_file_size_field.place(x=130, y=150)
 
     cpu_core_count_label = tkinter.Label(window, text="CPU cores to use: ")
     cpu_core_count_label.place(x=20, y=180)
     cpu_core_count_var.trace("w", lambda name, index, mode, cpu_core_count_var=cpu_core_count_var: callback())
     cpu_core_count_field = tkinter.Entry(window, width=3, textvariable=cpu_core_count_var)
-    cpu_core_count_field.place(x=120, y=180)
+    cpu_core_count_field.place(x=130, y=180)
 
     cpu_core_count_label = tkinter.Checkbutton(window, text='Keep original pictures', command=clear_path,
                                                variable=keep_originals,
@@ -119,10 +119,10 @@ def draw_gui():
     start_button.place(x=20, y=250)
 
     preview_button = tkinter.Button(window, text="Preview", command=make_preview)
-    preview_button.place(x=70, y=250)
+    preview_button.place(x=90, y=250)
 
     finished_label_percent = tkinter.Label(window, width=20, textvariable=finished_percent_var)
-    finished_label_percent.place(x=150, y=60)
+    finished_label_percent.place(x=170, y=60)
 
     window.mainloop()
 
@@ -138,9 +138,10 @@ def select_file():
     path = filedialog.askdirectory(
         title='Open a file',
         initialdir='/')
-    if not os.path.isdir(path.name):
+    if not os.path.isdir(path):
         folder_label_var.set("No root folder selected")
-    folder_label_var.set(path[-60:-30] + '\n' + path[-30:])
+    else:
+        folder_label_var.set(path[-60:-30] + '\n' + path[-30:])
 
 
 def list_all_files():
