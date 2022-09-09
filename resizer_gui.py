@@ -7,7 +7,7 @@ import tkinter
 from tkinter import filedialog
 from threading import *
 from tkinter.messagebox import showinfo, showwarning
-from PIL import ImageTk
+from pathlib import Path
 
 import PIL.Image
 import os
@@ -272,7 +272,7 @@ def list_all_files():
     global copy_finished_time
     if int(keep_originals.get()) == 1:
         status_var.set("Copying files")
-        current_working_directory = os.getcwd()
+        current_working_directory = Path(path).parent.resolve()
         new_directory_name = str(
             "resized_" + str(os.path.basename(path)) + "_" + str(datetime.datetime.now().strftime("%H_%M_%S")))
         new_directory_path = os.path.join(current_working_directory, new_directory_name)
