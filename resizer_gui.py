@@ -1,13 +1,13 @@
 import datetime
-import random
 import shutil
-import string
 import time
 import tkinter
 from tkinter import filedialog
+from tkinter import font
 from threading import *
 from tkinter.messagebox import showinfo, showwarning
 from pathlib import Path
+from PIL import Image, ImageTk
 
 import PIL.Image
 import os
@@ -37,7 +37,7 @@ path = ""
 en_dict = {
     "current_quality": "Current quality",
     "current_quality_png": "Current quality(PNG)",
-    "no_root_folder": "No root folder selected",
+    "no_root_folder": "No folder selected",
     "quality": "Quality: ",
     "quality_png": "Quality(PNG): ",
     "min_file_size": "Min file size: ",
@@ -47,7 +47,7 @@ en_dict = {
     "start_button": "Start",
     "preview_button": "Preview",
     "help_button": "Help",
-    "open_button": "Choose root folder",
+    "open_button": "Choose folder",
     "app_name": "Amalgam Image Resize Tool v1.0",
     "help_window": "Help window",
     "help_1": "The Amalgam Image Resize Tool has been created to process any .jpeg, .jpg, .bmp or .png image to smaller filesize, ready to upload into Sharepoint.",
@@ -56,7 +56,9 @@ en_dict = {
     "help_4": "Output format is .jpg (.png .bmp will be converted to .jpg).",
     "help_5": "Recursive sub-folder processing!",
     "help_6": "High quality & very fast processing!",
-    "how_to_use": "How to use:\nUse the 'Choose Folder' button to select a folder containing images.\nAny sub folders containing images will also be processed. \n\nQuality setting % for .jpg & .bmp:\nPresent to 89%.  ANY original .jpeg or .bmp image at this quality setting will be reduced to over half it's filesize with zero loss of quality.\nQuality setting % for .png: \nPNG original images need a different setting.  Present to 95%.  ANY original .png image at this quality setting will be reduced to at least half it's original filesize.\n\nMin Size (MB):\nThis controls the minimum size of image files to process. For example: Source folder contains 1mb images files that we do not want to reduce in size any further. So, set Min Size to 1mb, any source image file smaller than 1mb will be ignored.\n\nMax Size (MB):\nThis controls the minimum size of image files to process. Ignore any source image files over specified filesize in mb.\n\nCPU Threads:\nThis is set at 8 cpu threads by default. If you have higher performance cpu with more core/thread's then enter higher value to increase performance.\n\nKeep Original Files:\nIf un-checked, the original source images will be over-written in place.\nIf checked a re-saved copy of the source folder will be created next to the source. (sub-folder structure will be kept)."
+    "how_to_use": "How to use:\nUse the 'Choose Folder' button to select a folder containing images.\nAny sub folders containing images will also be processed. \n\nQuality setting % for .jpg & .bmp:\nPresent to 89%.  ANY original .jpeg or .bmp image at this quality setting will be reduced to over half it's filesize with zero loss of quality.\nQuality setting % for .png: \nPNG original images need a different setting.  Present to 95%.  ANY original .png image at this quality setting will be reduced to at least half it's original filesize.\n\nMin Size (MB):\nThis controls the minimum size of image files to process. For example: Source folder contains 1mb images files that we do not want to reduce in size any further. So, set Min Size to 1mb, any source image file smaller than 1mb will be ignored.\n\nMax Size (MB):\nThis controls the minimum size of image files to process. Ignore any source image files over specified filesize in mb.\n\nCPU Threads:\nThis is set at 8 cpu threads by default. If you have higher performance cpu with more core/thread's then enter higher value to increase performance.\n\nKeep Original Files:\nIf un-checked, the original source images will be over-written in place.\nIf checked a re-saved copy of the source folder will be created next to the source. (sub-folder structure will be kept).",
+    "help_max_width": 800,
+    "help_max_height": 655
 }
 ch_dict = {
     "current_quality": "当前质量",
@@ -80,7 +82,9 @@ ch_dict = {
     "help_4": "导出格式为jpg(png及bmp将被转换为jpg)",
     "help_5": "可处理多层子文件夹",
     "help_6": "高画质&快速图片处理",
-    "how_to_use": "如何使用\n使用“选择文件夹”按钮选择一个包含图像的文件夹。 任何包含图像的子文件夹也将被处理。\njpg和bmp格式画质设置%:\n默认89%。 在该设置下，任何jpeg或bmp图片将缩小至原始文件大小的一半以上，且画质零损失。\npng格式画质设置%:\nPng图片画质设置不同。默认95%。 在该设置下，任何png图片将被缩小至原始文件大小的至少一半。\n最小尺寸（MB）\n控制要处理的图像文件的最小尺寸。 示例:源文件夹包含1mb的图像文件，我们不想进一步减少其大小。 因此，将Min Size设置为1mb，任何小于1mb的源文件将被忽略。\n最大尺寸（MB）\n默认值50 mb。 控制要处理的图像文件的最大尺寸。 示例:忽略超过指定文件大小(以兆为单位)的任何源文件。\nCPU线程数默认8个CPU线程。 如果您有更高性能的CPU和更多的核/线程，那么输入更高的值来提高性能。\n保留原始文件:\n如果未勾选，原始图像将被覆盖 \n如果选中此项，将在源文件夹旁边创建源文件夹的副本。 (子文件夹结构将被保留)。\n"
+    "how_to_use": "如何使用\n使用“选择文件夹”按钮选择一个包含图像的文件夹。 任何包含图像的子文件夹也将被处理。\njpg和bmp格式画质设置%:\n默认89%。 在该设置下，任何jpeg或bmp图片将缩小至原始文件大小的一半以上，且画质零损失。\npng格式画质设置%:\nPng图片画质设置不同。默认95%。 在该设置下，任何png图片将被缩小至原始文件大小的至少一半。\n最小尺寸（MB）\n控制要处理的图像文件的最小尺寸。 示例:源文件夹包含1mb的图像文件，我们不想进一步减少其大小。 因此，将Min Size设置为1mb，任何小于1mb的源文件将被忽略。\n最大尺寸（MB）\n默认值50 mb。 控制要处理的图像文件的最大尺寸。 示例:忽略超过指定文件大小(以兆为单位)的任何源文件。\nCPU线程数默认8个CPU线程。 如果您有更高性能的CPU和更多的核/线程，那么输入更高的值来提高性能。\n保留原始文件:\n如果未勾选，原始图像将被覆盖 \n如果选中此项，将在源文件夹旁边创建源文件夹的副本。 (子文件夹结构将被保留)。\n",
+    "help_max_width": 650,
+    "help_max_height": 520
 }
 
 active_dict = en_dict
@@ -166,7 +170,7 @@ def draw_gui():
     window.title(active_dict['app_name'])
     window.geometry("450x300+200+200")
     window.resizable(False, False)
-    open_button = tkinter.Button(window, text='Choose root folder', command=select_file)
+    open_button = tkinter.Button(window, text='Choose folder', command=select_file)
     open_button.place(x=20, y=20)
     folder_label = tkinter.Label(window, textvariable=folder_label_var)
     folder_label.place(x=200, y=22)
@@ -217,16 +221,23 @@ def draw_gui():
 
     radiobutton_en = tkinter.Radiobutton(window, text="EN", variable=selected_language_eng, value=1,
                                          command=update_labels)
-    radiobutton_en.place(x=330, y=0)
+    radiobutton_en.place(x=260, y=2)
     radiobutton_ch = tkinter.Radiobutton(window, text="中国人", variable=selected_language_eng, value=0,
                                          command=update_labels)
-    radiobutton_ch.place(x=375, y=0)
+    radiobutton_ch.place(x=305, y=2)
 
     help_button = tkinter.Button(window, text="Help", command=open_help_page)
-    help_button.place(x=375, y=250)
+    help_button.place(x=375, y=0)
 
-    #logo = tkinter.Label(image=ImageTk.PhotoImage(PIL.Image.open("logo.png")))
-    #logo.place(x=0,y=0)
+    amalgam_logo_image = PIL.Image.open("full_logo.png")
+    amalgam_logo_image = amalgam_logo_image.resize(((round(amalgam_logo_image.size[0]*0.10), round(amalgam_logo_image.size[1]*0.10))))
+    amalgam_logo = ImageTk.PhotoImage(amalgam_logo_image)
+    logo_label = tkinter.Label(image=amalgam_logo)
+    logo_label.place(x=235,y=240)
+
+    ac_logo_image = ImageTk.PhotoImage(PIL.Image.open("logo.png"))
+    window.iconphoto(False,ac_logo_image)
+
 
     window.mainloop()
 
@@ -234,9 +245,9 @@ def draw_gui():
 def open_help_page():
     help_window = Toplevel(window)
     help_window.title(active_dict['help_window'])
-    help_window.geometry("300x300+700+200")
-    help_window.resizable(False, False)
-    text = tkinter.Text(help_window, height=40, width=40, wrap=WORD, bg='#323232')
+    help_window.geometry("800x655+650+150")
+    help_window.maxsize(active_dict['help_max_width'],active_dict['help_max_height'])
+    text = tkinter.Text(help_window, height=40, width=80, wrap=WORD,font=("TkDefaultFont", 15))
     scrollbar = tkinter.Scrollbar(help_window, command=text.yview, orient=VERTICAL)
 
     scrollbar.pack(side=tkinter.RIGHT, fill='y')
@@ -297,9 +308,8 @@ def make_preview():
         preview_path = filedialog.askopenfile(
             title='Choose a file to preview settings',
             initialdir='/').name
-        shutil.copy(preview_path, os.path.join(os.getcwd(), 'preview_original.jpg'))
-        shutil.copy(preview_path, os.path.join(os.getcwd(), 'preview_resized.jpg'))
-        resize([os.path.join(os.getcwd(), 'preview_resized.jpg')], Preview_mode=True)
+        shutil.copy(preview_path, os.path.join(Path(preview_path).parent.resolve(), str(Path(preview_path).stem))+'_resized'+Path(preview_path).suffix)
+        resize([os.path.join(Path(preview_path).parent.resolve(), str(Path(preview_path).stem))+'_resized'+Path(preview_path).suffix], Preview_mode=True)
         showinfo("Success", "Preview generated!")
     except Exception as e:
         print(e)
