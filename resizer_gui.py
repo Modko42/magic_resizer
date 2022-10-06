@@ -2,6 +2,7 @@ import datetime
 import shutil
 import time
 import tkinter
+import webbrowser
 from tkinter import filedialog
 from tkinter import font
 from threading import *
@@ -241,11 +242,16 @@ def draw_gui():
     ac_logo_image = ImageTk.PhotoImage(PIL.Image.open("logo.png"))
     window.iconphoto(False,ac_logo_image)
 
-    coded_by_label = tkinter.Label(window,text=active_dict['coded_by'],font=("TkDefaultFont", 10))
-    coded_by_label.place(x=315,y=278)
+    coded_by_label = tkinter.Label(window,text=active_dict['coded_by'],font=("TkDefaultFont", 8))
+    coded_by_label.place(x=315, y=278)
+    coded_by_label.bind("<Button-1>",lambda e:open_email())
+
 
     window.mainloop()
 
+
+def open_email():
+    webbrowser.open('mailto:?to=benjamin.kenesei@amalgamcollection.eu&subject=Image resizer feedback', new=1)
 
 def open_help_page():
     help_window = Toplevel(window)
