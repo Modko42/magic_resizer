@@ -241,7 +241,7 @@ def draw_gui():
     ac_logo_image = ImageTk.PhotoImage(PIL.Image.open("logo.png"))
     window.iconphoto(False,ac_logo_image)
 
-    coded_by_label = tkinter.Label(window,text=active_dict['coded_by'])
+    coded_by_label = tkinter.Label(window,text=active_dict['coded_by'],font=("TkDefaultFont", 10))
     coded_by_label.place(x=315,y=278)
 
     window.mainloop()
