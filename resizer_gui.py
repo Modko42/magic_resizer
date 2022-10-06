@@ -58,7 +58,8 @@ en_dict = {
     "help_6": "High quality & very fast processing!",
     "how_to_use": "How to use:\nUse the 'Choose Folder' button to select a folder containing images.\nAny sub folders containing images will also be processed. \n\nQuality setting % for .jpg & .bmp:\nPresent to 89%.  ANY original .jpeg or .bmp image at this quality setting will be reduced to over half it's filesize with zero loss of quality.\nQuality setting % for .png: \nPNG original images need a different setting.  Present to 95%.  ANY original .png image at this quality setting will be reduced to at least half it's original filesize.\n\nMin Size (MB):\nThis controls the minimum size of image files to process. For example: Source folder contains 1mb images files that we do not want to reduce in size any further. So, set Min Size to 1mb, any source image file smaller than 1mb will be ignored.\n\nMax Size (MB):\nThis controls the minimum size of image files to process. Ignore any source image files over specified filesize in mb.\n\nCPU Threads:\nThis is set at 8 cpu threads by default. If you have higher performance cpu with more core/thread's then enter higher value to increase performance.\n\nKeep Original Files:\nIf un-checked, the original source images will be over-written in place.\nIf checked a re-saved copy of the source folder will be created next to the source. (sub-folder structure will be kept).",
     "help_max_width": 800,
-    "help_max_height": 655
+    "help_max_height": 655,
+    "coded_by": "Coded by Beni Kenesei"
 }
 ch_dict = {
     "current_quality": "当前质量",
@@ -84,7 +85,8 @@ ch_dict = {
     "help_6": "高画质&快速图片处理",
     "how_to_use": "如何使用\n使用“选择文件夹”按钮选择一个包含图像的文件夹。 任何包含图像的子文件夹也将被处理。\njpg和bmp格式画质设置%:\n默认89%。 在该设置下，任何jpeg或bmp图片将缩小至原始文件大小的一半以上，且画质零损失。\npng格式画质设置%:\nPng图片画质设置不同。默认95%。 在该设置下，任何png图片将被缩小至原始文件大小的至少一半。\n最小尺寸（MB）\n控制要处理的图像文件的最小尺寸。 示例:源文件夹包含1mb的图像文件，我们不想进一步减少其大小。 因此，将Min Size设置为1mb，任何小于1mb的源文件将被忽略。\n最大尺寸（MB）\n默认值50 mb。 控制要处理的图像文件的最大尺寸。 示例:忽略超过指定文件大小(以兆为单位)的任何源文件。\nCPU线程数默认8个CPU线程。 如果您有更高性能的CPU和更多的核/线程，那么输入更高的值来提高性能。\n保留原始文件:\n如果未勾选，原始图像将被覆盖 \n如果选中此项，将在源文件夹旁边创建源文件夹的副本。 (子文件夹结构将被保留)。\n",
     "help_max_width": 650,
-    "help_max_height": 520
+    "help_max_height": 520,
+    "coded_by": "由 beni kenesei 编码"
 }
 
 active_dict = en_dict
@@ -166,6 +168,7 @@ def draw_gui():
         help_button.config(text=active_dict['help_button'])
         folder_label_var.set(active_dict['no_root_folder'])
         window.title(active_dict['app_name'])
+        coded_by_label.config(text=active_dict['coded_by'])
 
     window.title(active_dict['app_name'])
     window.geometry("450x300+200+200")
@@ -233,11 +236,13 @@ def draw_gui():
     amalgam_logo_image = amalgam_logo_image.resize(((round(amalgam_logo_image.size[0]*0.10), round(amalgam_logo_image.size[1]*0.10))))
     amalgam_logo = ImageTk.PhotoImage(amalgam_logo_image)
     logo_label = tkinter.Label(image=amalgam_logo)
-    logo_label.place(x=235,y=240)
+    logo_label.place(x=235,y=230)
 
     ac_logo_image = ImageTk.PhotoImage(PIL.Image.open("logo.png"))
     window.iconphoto(False,ac_logo_image)
 
+    coded_by_label = tkinter.Label(window,text=active_dict['coded_by'])
+    coded_by_label.place(x=315,y=278)
 
     window.mainloop()
 
@@ -284,8 +289,7 @@ def list_all_files():
     if int(keep_originals.get()) == 1:
         status_var.set("Copying files")
         current_working_directory = Path(path).parent.resolve()
-        new_directory_name = str(
-            "resized_" + str(os.path.basename(path)) + "_" + str(datetime.datetime.now().strftime("%H_%M_%S")))
+        new_directory_name = str(os.path.basename(path) + "_resized_" + str(datetime.datetime.now().strftime("%H_%M_%S")))
         new_directory_path = os.path.join(current_working_directory, new_directory_name)
         shutil.copytree(path, new_directory_path)
         copy_finished_time = time.time()
@@ -401,7 +405,7 @@ def resize(file_paths, Preview_mode=False):
         showinfo("Success", "Image compression finished")
         path = "No root folder selected"
         folder_label_var.set(path)
-        print("Total time  " + str(round(compression_finished_time - start_time, 2)) + " s")
+        print("\n\nTotal time  " + str(round(compression_finished_time - start_time, 2)) + " s")
         print("File copy   " + str(round(copy_finished_time - start_time, 2)) + " s")
         print("Compression " + str(round(compression_finished_time - copy_finished_time, 2)) + " s")
 
