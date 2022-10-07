@@ -233,19 +233,19 @@ def draw_gui():
     help_button = tkinter.Button(window, text="Help", command=open_help_page)
     help_button.place(x=375, y=0)
 
-    amalgam_logo_image = PIL.Image.open("full_logo.png")
-    amalgam_logo_image = amalgam_logo_image.resize(((round(amalgam_logo_image.size[0]*0.10), round(amalgam_logo_image.size[1]*0.10))))
+    amalgam_logo_image = PIL.Image.open("images/full_logo.png")
+    amalgam_logo_image = amalgam_logo_image.resize(
+        ((round(amalgam_logo_image.size[0] * 0.10), round(amalgam_logo_image.size[1] * 0.10))))
     amalgam_logo = ImageTk.PhotoImage(amalgam_logo_image)
     logo_label = tkinter.Label(image=amalgam_logo)
-    logo_label.place(x=235,y=230)
+    logo_label.place(x=235, y=230)
 
-    ac_logo_image = ImageTk.PhotoImage(PIL.Image.open("logo.png"))
-    window.iconphoto(False,ac_logo_image)
+    ac_logo_image = ImageTk.PhotoImage(PIL.Image.open("images/logo.png"))
+    window.iconphoto(False, ac_logo_image)
 
-    coded_by_label = tkinter.Label(window,text=active_dict['coded_by'],font=("TkDefaultFont", 8))
+    coded_by_label = tkinter.Label(window, text=active_dict['coded_by'], font=("TkDefaultFont", 8))
     coded_by_label.place(x=315, y=278)
-    coded_by_label.bind("<Button-1>",lambda e:open_email())
-
+    coded_by_label.bind("<Button-1>", lambda e: open_email())
 
     window.mainloop()
 
@@ -253,12 +253,13 @@ def draw_gui():
 def open_email():
     webbrowser.open('mailto:?to=benjamin.kenesei@amalgamcollection.eu&subject=Image resizer feedback', new=1)
 
+
 def open_help_page():
     help_window = Toplevel(window)
     help_window.title(active_dict['help_window'])
     help_window.geometry("800x655+650+150")
-    help_window.maxsize(active_dict['help_max_width'],active_dict['help_max_height'])
-    text = tkinter.Text(help_window, height=40, width=80, wrap=WORD,font=("TkDefaultFont", 15))
+    help_window.maxsize(active_dict['help_max_width'], active_dict['help_max_height'])
+    text = tkinter.Text(help_window, height=40, width=80, wrap=WORD, font=("TkDefaultFont", 15))
     scrollbar = tkinter.Scrollbar(help_window, command=text.yview, orient=VERTICAL)
 
     scrollbar.pack(side=tkinter.RIGHT, fill='y')
@@ -295,7 +296,8 @@ def list_all_files():
     if int(keep_originals.get()) == 1:
         status_var.set("Copying files")
         current_working_directory = Path(path).parent.resolve()
-        new_directory_name = str(os.path.basename(path) + "_resized_" + str(datetime.datetime.now().strftime("%H_%M_%S")))
+        new_directory_name = str(
+            os.path.basename(path) + "_resized_" + str(datetime.datetime.now().strftime("%H_%M_%S")))
         new_directory_path = os.path.join(current_working_directory, new_directory_name)
         shutil.copytree(path, new_directory_path)
         copy_finished_time = time.time()
@@ -318,8 +320,11 @@ def make_preview():
         preview_path = filedialog.askopenfile(
             title='Choose a file to preview settings',
             initialdir='/').name
-        shutil.copy(preview_path, os.path.join(Path(preview_path).parent.resolve(), str(Path(preview_path).stem))+'_resized'+Path(preview_path).suffix)
-        resize([os.path.join(Path(preview_path).parent.resolve(), str(Path(preview_path).stem))+'_resized'+Path(preview_path).suffix], Preview_mode=True)
+        shutil.copy(preview_path,
+                    os.path.join(Path(preview_path).parent.resolve(), str(Path(preview_path).stem)) + '_resized' + Path(
+                        preview_path).suffix)
+        resize([os.path.join(Path(preview_path).parent.resolve(), str(Path(preview_path).stem)) + '_resized' + Path(
+            preview_path).suffix], Preview_mode=True)
         showinfo("Success", "Preview generated!")
     except Exception as e:
         print(e)
